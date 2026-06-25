@@ -8,6 +8,7 @@ import { FloatingContact } from "@/components/FloatingContact";
 import { getCategories, getSettings } from "@/lib/db";
 import { SettingsProvider } from "@/lib/settings-context";
 import { themeCssVars } from "@/lib/settings";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default async function RootLayout({
             />
           </CartProvider>
         </SettingsProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
