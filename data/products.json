@@ -5,7 +5,7 @@
     "name": "Nitril Muayene Eldiveni Pudrasız (Mavi)",
     "description": "Yüksek dayanıklılıkta, lateks içermeyen nitril muayene eldiveni. Pudrasız, alerji riski düşük. Her iki ele uygun. Kutuda 100 adet.",
     "price": 189.9,
-    "oldPrice": 229.0,
+    "oldPrice": 229,
     "category": "muayene-eldivenleri",
     "image": "/products/nitril-mavi.svg",
     "unit": "Kutu (100 adet)",
@@ -180,5 +180,20 @@
     "stock": 200,
     "featured": false,
     "createdAt": "2026-06-12T10:00:00.000Z"
+  },
+  {
+    "id": "pmqs96pdd",
+    "slug": "nitril-eldiven-6pdd",
+    "name": "nitril eldiven",
+    "description": "",
+    "price": 240,
+    "oldPrice": 300,
+    "category": "muayene-eldivenleri",
+    "image": "/products/placeholder.svg",
+    "unit": "100",
+    "brand": "beybi",
+    "stock": 10000,
+    "featured": false,
+    "createdAt": "2026-06-24T15:53:53.137Z"
   }
 ]

@@ -2,31 +2,37 @@
   {
     "slug": "muayene-eldivenleri",
     "name": "Muayene Eldivenleri",
-    "description": "Nitril, lateks ve vinil muayene eldivenleri. Pudralı ve pudrasız seçenekler."
+    "description": "Nitril, lateks ve vinil muayene eldivenleri. Pudralı ve pudrasız seçenekler.",
+    "sort": 0
   },
   {
     "slug": "cerrahi-eldivenler",
     "name": "Cerrahi Eldivenler",
-    "description": "Steril cerrahi eldivenler, çift kat ve mikrocerrahi modelleri."
+    "description": "Steril cerrahi eldivenler, çift kat ve mikrocerrahi modelleri.",
+    "sort": 1
   },
   {
     "slug": "maske-yuz-koruma",
     "name": "Maske ve Yüz Koruma",
-    "description": "Cerrahi maske, N95/FFP2 maske, yüz siperliği ve gözlük."
+    "description": "Cerrahi maske, N95/FFP2 maske, yüz siperliği ve gözlük.",
+    "sort": 2
   },
   {
     "slug": "dezenfektan-hijyen",
     "name": "Dezenfektan ve Hijyen",
-    "description": "El ve yüzey dezenfektanları, antiseptik solüsyonlar."
+    "description": "El ve yüzey dezenfektanları, antiseptik solüsyonlar.",
+    "sort": 3
   },
   {
     "slug": "tibbi-sarf",
     "name": "Tıbbi Sarf Malzemeler",
-    "description": "Enjektör, gazlı bez, flaster, pamuk ve diğer sarf ürünleri."
+    "description": "Enjektör, gazlı bez, flaster, pamuk ve diğer sarf ürünleri.",
+    "sort": 4
   },
   {
     "slug": "koruyucu-ekipman",
     "name": "Koruyucu Önlük ve Ekipman",
-    "description": "Tek kullanımlık önlük, bone, galoş ve koruyucu tulum."
+    "description": "Tek kullanımlık önlük, bone, galoş ve koruyucu tulum.",
+    "sort": 5
   }
 ]

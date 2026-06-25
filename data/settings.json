@@ -1,22 +1,64 @@
 {
-  "siteName": "MediTedarik",
+  "iban": "TR00 0000 0000 0000 0000 0000 00",
+  "email": "oykuambalajtic@gmail.com",
+  "phone": "05319657608",
+  "theme": "teal",
+  "address": "Örnek Mah. Sağlık Cad. No:1, İstanbul",
+  "logoUrl": "/uploads/oyku-eldiven-logo-mqsxc64r.png",
+  "payKart": true,
   "tagline": "Medikal ve Hijyen Ürünleri Toptan Tedarik",
-  "logoLetter": "M",
-  "theme": "sky",
-  "announcement": "1.000 TL üzeri siparişlerde kargo ücretsiz 🚚",
-  "freeShippingLimit": 1000,
-  "heroBadge": "Toptan & Perakende Medikal Tedarik",
+  "twitter": "",
+  "youtube": "",
+  "bankName": "Örnek Bankası",
+  "facebook": "https://www.facebook.com/oyku.ambalaj.eldiven.fatih/",
+  "logoSize": "buyuk",
+  "siteName": "Öykü Ticaret",
+  "whatsapp": "905319657608",
+  "aboutText": "Öykü Eldiven, sağlık kuruluşları, eczaneler, klinikler ve işletmeler için medikal ve hijyen ürünleri tedarik eden bir kuruluştur. Muayene ve cerrahi eldivenden maskeye kadar geniş bir ürün yelpazesi sunuyoruz.\r\n\r\nAmacımız; orijinal, sertifikalı (CE) ürünleri uygun fiyatlarla, hızlı ve güvenilir biçimde sizlere ulaştırmaktır. Hem perakende hem de toptan satış imkânı sağlıyor, kurumsal müşterilerimize özel fiyat ve e-fatura çözümleri sunuyoruz.\r\n\r\nSorularınız ve toptan teklifleriniz için bizimle her zaman iletişime geçebilirsiniz.",
+  "heroBadge": "Toptan & Perakende Tedarik",
   "heroTitle": "Sağlık ve hijyen ürünlerinde",
-  "heroHighlight": "güvenilir adres",
+  "instagram": "https://www.instagram.com/oykuambalaj/",
+  "payHavale": true,
+  "payKapida": true,
+  "aboutStats": [
+    {
+      "label": "Mutlu müşteri",
+      "value": "10.000+"
+    },
+    {
+      "label": "Ürün çeşidi",
+      "value": "500+"
+    },
+    {
+      "label": "Kargo imkânı",
+      "value": "Aynı gün"
+    }
+  ],
+  "footerNote": "Ortaklar A.Ş tarafından yönetilmektedir",
+  "logoLetter": "M",
+  "accountName": "MediTedarik Medikal Ltd. Şti.",
+  "trustBadges": [
+    {
+      "icon": "💳",
+      "title": "Güvenli Ödeme",
+      "subtitle": "Kredi kartı & havale"
+    },
+    {
+      "icon": "📋",
+      "title": "Kurumsal Fatura",
+      "subtitle": "e-Fatura imkânı"
+    },
+    {
+      "icon": "✅",
+      "title": "Orijinal Ürün",
+      "subtitle": "CE / sertifikalı"
+    }
+  ],
+  "announcement": "Fiyatlarımıza kargo dahildir 🚚",
   "heroSubtitle": "Muayene eldiveni, cerrahi eldiven, maske, dezenfektan ve tıbbi sarf malzemeleri. Hızlı kargo, uygun fiyat, kurumsal fatura.",
+  "shippingCost": 0,
+  "heroHighlight": "güvenilir adres",
   "heroPrimaryBtn": "Ürünleri İncele",
   "heroSecondaryBtn": "WhatsApp ile Teklif Al",
-  "aboutText": "MediTedarik, sağlık kuruluşları, eczaneler, klinikler ve işletmeler için medikal ve hijyen ürünleri tedarik eden bir kuruluştur. Muayene ve cerrahi eldivenden maske, dezenfektan ve tıbbi sarf malzemelerine kadar geniş bir ürün yelpazesi sunuyoruz.\r\n\r\nAmacımız; orijinal, sertifikalı (CE) ürünleri uygun fiyatlarla, hızlı ve güvenilir biçimde sizlere ulaştırmaktır. Hem perakende hem de toptan satış imkânı sağlıyor, kurumsal müşterilerimize özel fiyat ve e-fatura çözümleri sunuyoruz.\r\n\r\nSorularınız ve toptan teklifleriniz için bizimle her zaman iletişime geçebilirsiniz.",
-  "phone": "0850 000 00 00",
-  "whatsapp": "905000000000",
-  "email": "info@meditedarik.com",
-  "address": "Örnek Mah. Sağlık Cad. No:1, İstanbul",
-  "bankName": "Örnek Bankası",
-  "iban": "TR00 0000 0000 0000 0000 0000 00",
-  "accountName": "MediTedarik Medikal Ltd. Şti."
+  "freeShippingLimit": 0
 }
