@@ -1,0 +1,22 @@
+{
+  "siteName": "MediTedarik",
+  "tagline": "Medikal ve Hijyen Ürünleri Toptan Tedarik",
+  "logoLetter": "M",
+  "theme": "sky",
+  "announcement": "1.000 TL üzeri siparişlerde kargo ücretsiz 🚚",
+  "freeShippingLimit": 1000,
+  "heroBadge": "Toptan & Perakende Medikal Tedarik",
+  "heroTitle": "Sağlık ve hijyen ürünlerinde",
+  "heroHighlight": "güvenilir adres",
+  "heroSubtitle": "Muayene eldiveni, cerrahi eldiven, maske, dezenfektan ve tıbbi sarf malzemeleri. Hızlı kargo, uygun fiyat, kurumsal fatura.",
+  "heroPrimaryBtn": "Ürünleri İncele",
+  "heroSecondaryBtn": "WhatsApp ile Teklif Al",
+  "aboutText": "MediTedarik, sağlık kuruluşları, eczaneler, klinikler ve işletmeler için medikal ve hijyen ürünleri tedarik eden bir kuruluştur. Muayene ve cerrahi eldivenden maske, dezenfektan ve tıbbi sarf malzemelerine kadar geniş bir ürün yelpazesi sunuyoruz.\r\n\r\nAmacımız; orijinal, sertifikalı (CE) ürünleri uygun fiyatlarla, hızlı ve güvenilir biçimde sizlere ulaştırmaktır. Hem perakende hem de toptan satış imkânı sağlıyor, kurumsal müşterilerimize özel fiyat ve e-fatura çözümleri sunuyoruz.\r\n\r\nSorularınız ve toptan teklifleriniz için bizimle her zaman iletişime geçebilirsiniz.",
+  "phone": "0850 000 00 00",
+  "whatsapp": "905000000000",
+  "email": "info@meditedarik.com",
+  "address": "Örnek Mah. Sağlık Cad. No:1, İstanbul",
+  "bankName": "Örnek Bankası",
+  "iban": "TR00 0000 0000 0000 0000 0000 00",
+  "accountName": "MediTedarik Medikal Ltd. Şti."
+}

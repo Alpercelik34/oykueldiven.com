@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "muayene-eldivenleri",
+    "name": "Muayene Eldivenleri",
+    "description": "Nitril, lateks ve vinil muayene eldivenleri. Pudralı ve pudrasız seçenekler."
+  },
+  {
+    "slug": "cerrahi-eldivenler",
+    "name": "Cerrahi Eldivenler",
+    "description": "Steril cerrahi eldivenler, çift kat ve mikrocerrahi modelleri."
+  },
+  {
+    "slug": "maske-yuz-koruma",
+    "name": "Maske ve Yüz Koruma",
+    "description": "Cerrahi maske, N95/FFP2 maske, yüz siperliği ve gözlük."
+  },
+  {
+    "slug": "dezenfektan-hijyen",
+    "name": "Dezenfektan ve Hijyen",
+    "description": "El ve yüzey dezenfektanları, antiseptik solüsyonlar."
+  },
+  {
+    "slug": "tibbi-sarf",
+    "name": "Tıbbi Sarf Malzemeler",
+    "description": "Enjektör, gazlı bez, flaster, pamuk ve diğer sarf ürünleri."
+  },
+  {
+    "slug": "koruyucu-ekipman",
+    "name": "Koruyucu Önlük ve Ekipman",
+    "description": "Tek kullanımlık önlük, bone, galoş ve koruyucu tulum."
+  }
+]

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#065f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#g)"/>
+  <circle cx="300" cy="200" r="90" fill="rgba(255,255,255,0.18)"/>
+  <text x="300" y="225" text-anchor="middle" font-size="90" fill="#ffffff">+</text>
+  <text text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#ffffff"><tspan x="300" y="284">Yüzey Dezenfektanı</tspan><tspan x="300" y="316">1 L</tspan></text>
+</svg>

@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Docker imajını küçük tutmak için bağımsız (standalone) çıktı.
+  output: "standalone",
 };
 
 export default nextConfig;
