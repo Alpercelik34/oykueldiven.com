@@ -1,17 +1,17 @@
 import "server-only";
+import { cache } from "react";
 import postgres from "postgres";
 import type { Category, Order, OrderItem, Product } from "./types";
 import { DEFAULT_SETTINGS, type Settings } from "./settings";
 
 // Postgres tabanlı veri deposu (canlı/üretim için).
 // DATABASE_URL tanımlı olduğunda db.ts otomatik olarak bunu kullanır.
+//
+// Sunucusuz ortam (Vercel) notu: her işlem için TAZE bir bağlantı açıp
+// hemen kapatıyoruz. Böylece donan/yeniden uyanan sunucu örneklerinde
+// "bayat" (yarı açık) bağlantı kalmıyor ve istekler takılmıyor.
 
 type Sql = ReturnType<typeof postgres>;
-
-// Bağlantı havuzunu globalThis'te sakla. Böylece geliştirme modunda HMR
-// (sıcak yeniden yükleme) her seferinde yeni havuz açıp bağlantıları
-// tüketmez ("too many connections" hatasını önler).
-const globalForPg = globalThis as unknown as { _pgSql?: Sql };
 
 // Yerel/Docker içi Postgres'te SSL kapalı, uzak sunucularda (Supabase vb.) açık.
 function needsSsl(url: string): boolean {
@@ -22,22 +22,24 @@ function needsSsl(url: string): boolean {
   return true;
 }
 
-function db(): Sql {
-  if (!globalForPg._pgSql) {
-    const url = process.env.DATABASE_URL;
-    if (!url) throw new Error("DATABASE_URL tanımlı değil.");
-    globalForPg._pgSql = postgres(url, {
-      // Supabase/PgBouncer "transaction" havuzu ile uyum için:
-      prepare: false,
-      ssl: needsSsl(url) ? "require" : false,
-      // Sunucusuz ortam (Vercel) için: her örnekte tek bağlantı tut;
-      // böylece uzak havuza (Supabase) aynı anda çok bağlantı açıp takılmaz.
-      max: 1,
-      idle_timeout: 20, // boşta kalan bağlantıyı 20 sn sonra kapat
-      connect_timeout: 15, // bağlanamazsa 15 sn'de hata ver (sonsuz takılma yok)
-    });
+// Her çağrıda taze bağlantı aç, işi yap, bağlantıyı kapat.
+async function run<T>(fn: (sql: Sql) => Promise<T>): Promise<T> {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL tanımlı değil.");
+  const sql = postgres(url, {
+    prepare: false, // Supabase/PgBouncer "transaction" havuzu ile uyum için
+    ssl: needsSsl(url) ? "require" : false,
+    max: 1,
+    connect_timeout: 10, // bağlanamazsa 10 sn'de hata ver
+    idle_timeout: 3,
+    max_lifetime: 30,
+  });
+  try {
+    return await fn(sql);
+  } finally {
+    // İşi biten bağlantıyı kapat (bayat bağlantı kalmasın).
+    sql.end({ timeout: 5 }).catch(() => {});
   }
-  return globalForPg._pgSql;
 }
 
 // ---- Satır tipleri ----
@@ -94,6 +96,15 @@ function toProduct(r: ProductRow): Product {
   };
 }
 
+function toCategory(r: CategoryRow): Category {
+  return {
+    slug: r.slug,
+    name: r.name,
+    description: r.description ?? undefined,
+    sort: r.sort ?? 0,
+  };
+}
+
 function toOrder(r: OrderRow): Order {
   return {
     id: r.id,
@@ -106,175 +117,200 @@ function toOrder(r: OrderRow): Order {
   };
 }
 
+// Okuma fonksiyonları React cache() ile sarılı: aynı istek içinde aynı sorgu
+// bir kez çalışır (ör. kategoriler hem layout hem sayfada kullanılınca).
+
 // ---- Site Ayarları ----
-export async function getSettings(): Promise<Settings> {
-  const rows = await db()<{ data: Partial<Settings> }[]>`
-    select data from settings where id = 1
-  `;
-  return { ...DEFAULT_SETTINGS, ...(rows[0]?.data ?? {}) };
-}
+export const getSettings = cache(
+  async (): Promise<Settings> =>
+    run(async (sql) => {
+      const rows = await sql<{ data: Partial<Settings> }[]>`
+        select data from settings where id = 1
+      `;
+      return { ...DEFAULT_SETTINGS, ...(rows[0]?.data ?? {}) };
+    }),
+);
 
 export async function saveSettings(settings: Settings): Promise<void> {
-  const s = db();
-  await s`
-    insert into settings (id, data) values (1, ${s.json(settings)})
-    on conflict (id) do update set data = excluded.data
-  `;
+  await run(
+    (sql) => sql`
+      insert into settings (id, data) values (1, ${sql.json(settings)})
+      on conflict (id) do update set data = excluded.data
+    `,
+  );
 }
 
 // ---- Kategoriler ----
-export async function getCategories(): Promise<Category[]> {
-  const rows = await db()<CategoryRow[]>`
-    select slug, name, description, sort from categories
-    order by sort asc nulls first, name asc
-  `;
-  return rows.map((r) => ({
-    slug: r.slug,
-    name: r.name,
-    description: r.description ?? undefined,
-    sort: r.sort ?? 0,
-  }));
-}
+export const getCategories = cache(
+  async (): Promise<Category[]> =>
+    run(async (sql) => {
+      const rows = await sql<CategoryRow[]>`
+        select slug, name, description, sort from categories
+        order by sort asc nulls first, name asc
+      `;
+      return rows.map(toCategory);
+    }),
+);
 
-export async function getCategory(slug: string): Promise<Category | undefined> {
-  const rows = await db()<CategoryRow[]>`
-    select slug, name, description, sort from categories where slug = ${slug} limit 1
-  `;
-  const r = rows[0];
-  return r
-    ? {
-        slug: r.slug,
-        name: r.name,
-        description: r.description ?? undefined,
-        sort: r.sort ?? 0,
-      }
-    : undefined;
-}
+export const getCategory = cache(
+  async (slug: string): Promise<Category | undefined> =>
+    run(async (sql) => {
+      const rows = await sql<CategoryRow[]>`
+        select slug, name, description, sort from categories
+        where slug = ${slug} limit 1
+      `;
+      return rows[0] ? toCategory(rows[0]) : undefined;
+    }),
+);
 
 export async function saveCategory(category: Category): Promise<void> {
-  const s = db();
-  await s`
-    insert into categories (slug, name, description, sort)
-    values (${category.slug}, ${category.name}, ${category.description ?? null},
-            ${category.sort ?? 0})
-    on conflict (slug) do update set
-      name = excluded.name, description = excluded.description,
-      sort = excluded.sort
-  `;
+  await run(
+    (sql) => sql`
+      insert into categories (slug, name, description, sort)
+      values (${category.slug}, ${category.name}, ${category.description ?? null},
+              ${category.sort ?? 0})
+      on conflict (slug) do update set
+        name = excluded.name, description = excluded.description,
+        sort = excluded.sort
+    `,
+  );
 }
 
 export async function deleteCategory(slug: string): Promise<void> {
-  await db()`delete from categories where slug = ${slug}`;
+  await run((sql) => sql`delete from categories where slug = ${slug}`);
 }
 
 // ---- Ürünler ----
-export async function getProducts(): Promise<Product[]> {
-  const rows = await db()<ProductRow[]>`
-    select * from products order by created_at desc
-  `;
-  return rows.map(toProduct);
-}
+export const getProducts = cache(
+  async (): Promise<Product[]> =>
+    run(async (sql) => {
+      const rows = await sql<ProductRow[]>`
+        select * from products order by created_at desc
+      `;
+      return rows.map(toProduct);
+    }),
+);
 
-export async function getProduct(slug: string): Promise<Product | undefined> {
-  const rows = await db()<ProductRow[]>`
-    select * from products where slug = ${slug} limit 1
-  `;
-  return rows[0] ? toProduct(rows[0]) : undefined;
-}
+export const getProduct = cache(
+  async (slug: string): Promise<Product | undefined> =>
+    run(async (sql) => {
+      const rows = await sql<ProductRow[]>`
+        select * from products where slug = ${slug} limit 1
+      `;
+      return rows[0] ? toProduct(rows[0]) : undefined;
+    }),
+);
 
-export async function getProductById(id: string): Promise<Product | undefined> {
-  const rows = await db()<ProductRow[]>`
-    select * from products where id = ${id} limit 1
-  `;
-  return rows[0] ? toProduct(rows[0]) : undefined;
-}
+export const getProductById = cache(
+  async (id: string): Promise<Product | undefined> =>
+    run(async (sql) => {
+      const rows = await sql<ProductRow[]>`
+        select * from products where id = ${id} limit 1
+      `;
+      return rows[0] ? toProduct(rows[0]) : undefined;
+    }),
+);
 
-export async function getProductsByCategory(
-  categorySlug: string,
-): Promise<Product[]> {
-  const rows = await db()<ProductRow[]>`
-    select * from products where category = ${categorySlug}
-    order by created_at desc
-  `;
-  return rows.map(toProduct);
-}
+export const getProductsByCategory = cache(
+  async (categorySlug: string): Promise<Product[]> =>
+    run(async (sql) => {
+      const rows = await sql<ProductRow[]>`
+        select * from products where category = ${categorySlug}
+        order by created_at desc
+      `;
+      return rows.map(toProduct);
+    }),
+);
 
-export async function getFeaturedProducts(): Promise<Product[]> {
-  const rows = await db()<ProductRow[]>`
-    select * from products where featured = true order by created_at desc
-  `;
-  return rows.map(toProduct);
-}
+export const getFeaturedProducts = cache(
+  async (): Promise<Product[]> =>
+    run(async (sql) => {
+      const rows = await sql<ProductRow[]>`
+        select * from products where featured = true order by created_at desc
+      `;
+      return rows.map(toProduct);
+    }),
+);
 
 export async function searchProducts(query: string): Promise<Product[]> {
   const q = query.trim();
   if (!q) return [];
   const like = `%${q}%`;
-  const rows = await db()<ProductRow[]>`
-    select * from products
-    where name ilike ${like}
-       or description ilike ${like}
-       or coalesce(brand, '') ilike ${like}
-    order by created_at desc
-  `;
-  return rows.map(toProduct);
+  return run(async (sql) => {
+    const rows = await sql<ProductRow[]>`
+      select * from products
+      where name ilike ${like}
+         or description ilike ${like}
+         or coalesce(brand, '') ilike ${like}
+      order by created_at desc
+    `;
+    return rows.map(toProduct);
+  });
 }
 
 export async function saveProduct(product: Product): Promise<void> {
-  const s = db();
-  await s`
-    insert into products
-      (id, slug, name, description, price, old_price, category, image,
-       unit, brand, sku, stock, featured, created_at)
-    values
-      (${product.id}, ${product.slug}, ${product.name}, ${product.description},
-       ${product.price}, ${product.oldPrice ?? null}, ${product.category},
-       ${product.image}, ${product.unit ?? null}, ${product.brand ?? null},
-       ${product.sku ?? null}, ${product.stock}, ${product.featured ?? false},
-       ${product.createdAt})
-    on conflict (id) do update set
-      slug = excluded.slug, name = excluded.name,
-      description = excluded.description, price = excluded.price,
-      old_price = excluded.old_price, category = excluded.category,
-      image = excluded.image, unit = excluded.unit, brand = excluded.brand,
-      sku = excluded.sku, stock = excluded.stock, featured = excluded.featured
-  `;
+  await run(
+    (sql) => sql`
+      insert into products
+        (id, slug, name, description, price, old_price, category, image,
+         unit, brand, sku, stock, featured, created_at)
+      values
+        (${product.id}, ${product.slug}, ${product.name}, ${product.description},
+         ${product.price}, ${product.oldPrice ?? null}, ${product.category},
+         ${product.image}, ${product.unit ?? null}, ${product.brand ?? null},
+         ${product.sku ?? null}, ${product.stock}, ${product.featured ?? false},
+         ${product.createdAt})
+      on conflict (id) do update set
+        slug = excluded.slug, name = excluded.name,
+        description = excluded.description, price = excluded.price,
+        old_price = excluded.old_price, category = excluded.category,
+        image = excluded.image, unit = excluded.unit, brand = excluded.brand,
+        sku = excluded.sku, stock = excluded.stock, featured = excluded.featured
+    `,
+  );
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  await db()`delete from products where id = ${id}`;
+  await run((sql) => sql`delete from products where id = ${id}`);
 }
 
 // ---- Siparişler ----
-export async function getOrders(): Promise<Order[]> {
-  const rows = await db()<OrderRow[]>`
-    select * from orders order by created_at desc
-  `;
-  return rows.map(toOrder);
-}
+export const getOrders = cache(
+  async (): Promise<Order[]> =>
+    run(async (sql) => {
+      const rows = await sql<OrderRow[]>`
+        select * from orders order by created_at desc
+      `;
+      return rows.map(toOrder);
+    }),
+);
 
-export async function getOrderById(id: string): Promise<Order | undefined> {
-  const rows = await db()<OrderRow[]>`
-    select * from orders where id = ${id} limit 1
-  `;
-  return rows[0] ? toOrder(rows[0]) : undefined;
-}
+export const getOrderById = cache(
+  async (id: string): Promise<Order | undefined> =>
+    run(async (sql) => {
+      const rows = await sql<OrderRow[]>`
+        select * from orders where id = ${id} limit 1
+      `;
+      return rows[0] ? toOrder(rows[0]) : undefined;
+    }),
+);
 
 export async function saveOrder(order: Order): Promise<void> {
-  const s = db();
-  await s`
-    insert into orders
-      (id, items, customer, total, payment_method, status, created_at)
-    values
-      (${order.id}, ${s.json(order.items)}, ${s.json(order.customer)},
-       ${order.total}, ${order.paymentMethod}, ${order.status},
-       ${order.createdAt})
-  `;
+  await run(
+    (sql) => sql`
+      insert into orders
+        (id, items, customer, total, payment_method, status, created_at)
+      values
+        (${order.id}, ${sql.json(order.items)}, ${sql.json(order.customer)},
+         ${order.total}, ${order.paymentMethod}, ${order.status},
+         ${order.createdAt})
+    `,
+  );
 }
 
 export async function updateOrderStatus(
   id: string,
   status: Order["status"],
 ): Promise<void> {
-  await db()`update orders set status = ${status} where id = ${id}`;
+  await run((sql) => sql`update orders set status = ${status} where id = ${id}`);
 }
